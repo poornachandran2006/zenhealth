@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenHealth - Authentication</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-red-400">
+
+  <!-- Card -->
+  <div class="w-full max-w-md bg-white/10 backdrop-blur-xl shadow-2xl rounded-3xl p-8 text-white border border-white/20">
+
+    <!-- Logo / Title -->
+    <h1 class="text-4xl font-extrabold text-center mb-2 tracking-wide">🧘 ZenHealth</h1>
+    <p class="text-center text-gray-200 mb-6 text-sm">Your gateway to wellness, secured with care</p>
+
+    <!-- Message -->
+    <p id="message" class="text-center text-green-300 font-semibold mb-6"></p>
+
+    <!-- Tabs -->
+    <div class="flex justify-center mb-8 space-x-4">
+      <button id="loginTab" class="px-6 py-2 rounded-full font-semibold shadow-md bg-gradient-to-r from-pink-400 to-purple-500 text-purple-900">Login</button>
+      <button id="signupTab" class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-green-400 to-emerald-500 text-purple-900">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label class="block text-sm mb-1">Username</label>
+        <input id="loginUsername" type="text" placeholder="Enter username" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Password</label>
+        <input id="loginPassword" type="password" placeholder="Enter password" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+      </div>
+      <button type="submit" class="w-full py-2 rounded-lg bg-gradient-to-r from-pink-400 to-purple-500 font-bold text-purple-900 shadow-lg">Login</button>
+    </form>
+
+    <!-- Signup Form (hidden by default) -->
+    <form id="signupForm" class="space-y-5 hidden">
+      <div>
+        <label class="block text-sm mb-1">Choose Username</label>
+        <input id="signupUsername" type="text" placeholder="New username" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Choose Password</label>
+        <input id="signupPassword" type="password" placeholder="New password" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+      </div>
+      <button type="submit" class="w-full py-2 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 font-bold text-purple-900 shadow-lg">Sign Up</button>
+    </form>
+
+  </div>
+
+  <!-- Script -->
+  <script>
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const message = document.getElementById("message");
+
+    // Load users from localStorage
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users")) || [];
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    // Tab switching
+    loginTab.addEventListener("click", () => {
+      loginForm.classList.remove("hidden");
+      signupForm.classList.add("hidden");
+      message.textContent = "";
+    });
+
+    signupTab.addEventListener("click", () => {
+      signupForm.classList.remove("hidden");
+      loginForm.classList.add("hidden");
+      message.textContent = "";
+    });
+
+    // Signup functionality
+    signupForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+
+      if (!username || !password) {
+        message.textContent = "⚠️ Please fill all fields.";
+        message.className = "text-center text-yellow-300 font-semibold mb-6";
+        return;
+      }
+
+      let users = getUsers();
+
+      // Check if user already exists
+      const userExists = users.some(user => user.username === username);
+
+      if (userExists) {
+        message.textContent = `⚠️ The username "${username}" is already registered!`;
+        message.className = "text-center text-red-400 font-semibold mb-6";
+      } else {
+        users.push({ username, password });
+        saveUsers(users);
+        message.textContent = "✅ Successfully registered!";
+        message.className = "text-center text-green-300 font-semibold mb-6";
+        signupForm.reset();
+      }
+    });
+
+    // Login functionality
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      let users = getUsers();
+
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        message.textContent = `👋 Welcome back, ${username}!`;
+        message.className = "text-center text-green-300 font-semibold mb-6";
+        loginForm.reset();
+
+        // ✅ Redirect to another page
+        setTimeout(() => {
+          window.location.href = "sample2.html";
+        }, 1200); // waits 1.2s before redirect
+      } else {
+        message.textContent = "❌ Invalid username or password.";
+        message.className = "text-center text-red-400 font-semibold mb-6";
+      }
+    });
+  </script>
+
+</body>
+</html>
